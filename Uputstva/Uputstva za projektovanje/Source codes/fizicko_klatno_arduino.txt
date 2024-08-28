@@ -1,0 +1,43 @@
+volatile long counter = 0; // Variable to store the position of the Encoder
+volatile boolean state_a;
+volatile boolean state_b;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // Wait for serial connection
+  }
+
+  pinMode(18, INPUT_PULLUP);
+  pinMode(19, INPUT_PULLUP);
+
+  state_a = digitalRead(2);
+  state_b = digitalRead(3);
+
+  attachInterrupt(digitalPinToInterrupt(18), ISR_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(19), ISR_B, CHANGE);
+}
+
+void loop() {
+  Serial.println(counter);
+
+  delay(50); // Delay for stability in plotting
+}
+
+void ISR_A() {
+  state_a = !state_a;
+  if (state_a == state_b) {
+    counter++;
+  } else {
+    counter--;
+  }
+}
+
+void ISR_B() {
+  state_b = !state_b;
+  if (state_b == state_a) {
+    counter--;
+  } else {
+    counter++;
+  }
+}

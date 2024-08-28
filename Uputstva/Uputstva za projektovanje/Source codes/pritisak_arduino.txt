@@ -1,0 +1,67 @@
+//Kod za Arduino UNO za merenje pritiska i temperature istovremeno, real time u python-u
+#include <TimerOne.h>
+
+int out_Val, out_pressure;
+int duty = 500;
+int pin = 9;
+
+int analogReadMean(int pin = A0, double num_samp = 100.0){
+  long val = 0;
+  int ii = 0;
+    for (ii = 1;ii<num_samp;ii++){
+      val = val + analogRead(pin);
+      }
+      return val = val/num_samp;
+  }
+
+void setup() {
+  // put your setup code here, to run once:
+  Timer1.initialize(1000);  // 1 kHz
+  Serial.begin(9600);
+  //Serial.flush(); //deleting previous data if there is some
+
+  out_Val = analogRead(A0);
+
+  while (out_Val > 410 || out_Val < 390) {
+    out_Val = analogRead(A0);
+    if (out_Val > 410) {
+      duty = duty + 1;
+      Timer1.pwm(pin, duty, 1000);
+      //delay(50);
+    } else if (out_Val < 390) {
+      duty = duty - 1;
+      Timer1.pwm(pin, duty, 1000);
+      //delay(50);   //50
+    } else {}
+    //
+    //Serial.print(duty);
+    //Serial.print(",");
+    int out_pressure = analogReadMean(A2,100.0);
+    out_pressure = out_pressure - 620;
+    Serial.print(out_pressure);
+    Serial.print(",");
+    Serial.println(out_Val);
+    delay(50); //Mozda pomogne sa problemom latency 100
+  }
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  //-----------------------------------------------------
+      //Da dodamo i merenje pritiska
+      int out_pressure = analogReadMean(A2,100.0);
+      out_pressure = out_pressure - 620;
+      Serial.print(out_pressure);
+      Serial.print(",");
+
+      //--------------------------------------------------
+      
+      out_Val = analogRead(A0);
+      Serial.println(out_Val);
+      delay(50);   //Ovo dosta pomaze za python real time 100
+
+      
+
+
+} 
